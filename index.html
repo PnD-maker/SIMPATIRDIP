@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIMPATI - Sistem Informasi Monitoring Asistensi Pemulangan dan Deportasi</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            immi: {
+              dark: '#0A192F',    // Navy Tua Keimigrasian
+              navy: '#0A2540',    // Navy Utama
+              blue: '#0066CC',    // Biru Aksen
+              gold: '#D4AF37',    // Emas Pengayoman
+              accent: '#00A8A8',  // Teal
+              bg: '#F4F6F9',      // Slate Abu Terang
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="bg-immi-bg font-sans text-slate-800 antialiased min-h-screen flex flex-col">
+
+  <!-- TOP HEADER / NAVBAR -->
+  <header class="bg-immi-navy text-white shadow-lg border-b-4 border-immi-gold sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
+      <!-- Logo & Title -->
+      <div class="flex items-center space-x-3 w-full md:w-auto justify-between md:justify-start">
+        <div class="flex items-center space-x-3">
+          <!-- Official SIMPATI Humanis Emblem SVG Container -->
+          <div class="w-14 h-16 bg-immi-dark rounded-xl flex items-center justify-center p-0.5 border border-immi-gold/60 shadow-lg overflow-hidden flex-shrink-0">
+            <svg class="w-full h-full drop-shadow-md" viewBox="0 0 500 550" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#FFE57F" />
+                  <stop offset="45%" stop-color="#D4AF37" />
+                  <stop offset="100%" stop-color="#996B10" />
+                </linearGradient>
+
+                <linearGradient id="blueGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#142C4C" />
+                  <stop offset="100%" stop-color="#071526" />
+                </linearGradient>
+
+                <linearGradient id="shieldLeftGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#0A1829" />
+                  <stop offset="100%" stop-color="#142C4C" />
+                </linearGradient>
+              </defs>
+
+              <polygon points="250,22 257,42 278,42 261,54 267,74 250,62 233,74 239,54 222,42 243,42" fill="url(#goldGrad)" />
+
+              <path d="M 250,85 C 335,85 385,112 395,165 C 395,280 330,380 250,425 C 170,380 105,280 105,165 C 115,112 165,85 250,85 Z" fill="none" stroke="url(#goldGrad)" stroke-width="12" stroke-linejoin="round" />
+
+              <path d="M 250,93 C 328,93 375,118 384,166 C 384,272 324,365 250,408 C 176,365 116,272 116,166 C 125,118 172,93 250,93 Z" fill="url(#blueGrad)" />
+
+              <path d="M 250,93 C 172,93 125,118 116,166 C 116,272 176,365 250,408 Z" fill="url(#shieldLeftGrad)" opacity="0.4" />
+
+              <path d="M 250,103 C 320,103 363,125 371,168 C 371,262 316,350 250,390 C 184,350 129,262 129,168 C 137,125 180,103 250,103 Z" fill="none" stroke="url(#goldGrad)" stroke-width="2" opacity="0.6" />
+
+              <g transform="translate(250, 246)">
+                <circle cx="0" cy="0" r="72" fill="none" stroke="url(#goldGrad)" stroke-width="3.5" opacity="0.85"/>
+                <line x1="-72" y1="0" x2="72" y2="0" stroke="url(#goldGrad)" stroke-width="2" opacity="0.6"/>
+                <line x1="0" y1="-72" x2="0" y2="72" stroke="url(#goldGrad)" stroke-width="2" opacity="0.6"/>
+                <ellipse cx="0" cy="0" rx="42" ry="72" fill="none" stroke="url(#goldGrad)" stroke-width="2" opacity="0.6"/>
+                <ellipse cx="0" cy="0" rx="72" ry="36" fill="none" stroke="url(#goldGrad)" stroke-width="2" opacity="0.6"/>
+
+                <path d="M -75,-15 C -70,-55 -35,-82 10,-82 C 45,-82 75,-62 78,-32 C 79,-20 70,-15 60,-22 C 48,-30 28,-38 0,-38 C -32,-38 -55,-25 -65,-10 C -68,-5 -72,-5 -75,-15 Z" fill="url(#goldGrad)" />
+                <path d="M -45,-38 C -30,-58 -5,-65 20,-62 C 28,-61 28,-52 18,-54 C 0,-57 -20,-52 -35,-38 Z" fill="url(#goldGrad)" opacity="0.9"/>
+
+                <path d="M 75,15 C 70,55 35,82 -10,82 C -45,82 -75,62 -78,32 C -79,20 -70,15 -60,22 C -48,30 -28,38 0,38 C 32,38 55,25 65,10 C 68,5 72,5 75,15 Z" fill="url(#goldGrad)" />
+                <path d="M 45,38 C 30,58 5,65 -20,62 C -28,61 -28,52 -18,54 C 0,57 20,52 35,38 Z" fill="url(#goldGrad)" opacity="0.9"/>
+              </g>
+
+              <text x="250" y="475" font-family="'Arial Black', 'Montserrat', 'Helvetica', sans-serif" font-size="42" font-weight="900" letter-spacing="5" fill="#FFFFFF" text-anchor="middle">SIMPATI</text>
+              <text x="250" y="505" font-family="'Arial', 'Helvetica', sans-serif" font-size="13.5" font-weight="800" letter-spacing="1.5" fill="#D4AF37" text-anchor="middle">SISTEM INFORMASI MONITORING</text>
+              <text x="250" y="525" font-family="'Arial', 'Helvetica', sans-serif" font-size="13.5" font-weight="800" letter-spacing="1.2" fill="#D4AF37" text-anchor="middle">ASISTENSI PEMULANGAN DAN DEPORTASI</text>
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-xl sm:text-2xl font-black tracking-wider uppercase text-white flex items-center gap-2">
+              SIMPATI
+            </h1>
+            <p class="text-xs text-slate-300 font-medium">Sistem Informasi Monitoring Asistensi Pemulangan dan Deportasi</p>
+            <p class="text-[10px] text-immi-gold font-semibold tracking-wide uppercase">Rudenim Pusat Tanjung Pinang</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div id="navActions" class="flex flex-wrap items-center gap-2 w-full md:w-auto justify-end">
+        <button onclick="generateAIExecutiveReport()" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center gap-2 shadow-md border border-amber-400/40">
+          <i class="fa-solid fa-wand-magic-sparkles text-amber-200"></i>
+          <span>Analisis AI Pimpinan</span>
+        </button>
+        <button onclick="openAddModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-lg text-xs sm:text-sm font-medium transition flex items-center gap-2 shadow">
+          <i class="fa-solid fa-user-plus"></i>
+          <span>Tambah Deteni</span>
+        </button>
+        <button onclick="exportToCSV()" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-medium transition flex items-center gap-2">
+          <i class="fa-solid fa-file-csv text-emerald-400"></i>
+          <span>Ekspor CSV</span>
+        </button>
+        <button onclick="window.print()" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-medium transition flex items-center gap-2">
+          <i class="fa-solid fa-print text-immi-gold"></i>
+          <span>Cetak</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full">
+
+    <!-- DASHBOARD METRICS SUMMARY -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <!-- Total Deteni -->
+      <div class="bg-white rounded-xl p-5 border border-slate-200/80 shadow-sm hover:shadow-md transition">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Deteni</p>
+            <h3 id="statTotal" class="text-3xl font-bold text-slate-800 mt-1">0</h3>
+          </div>
+          <div class="w-12 h-12 bg-blue-50 text-immi-blue rounded-xl flex items-center justify-center text-xl">
+            <i class="fa-solid fa-users"></i>
+          </div>
+        </div>
+        <p class="text-xs text-slate-400 mt-3 flex items-center gap-1">
+          <i class="fa-solid fa-circle-info text-blue-500"></i>
+          Aktif & Selesai di Rudenim
+        </p>
+      </div>
+
+      <!-- Proses Pendeportasian -->
+      <div class="bg-white rounded-xl p-5 border border-slate-200/80 shadow-sm hover:shadow-md transition">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Proses Deportasi</p>
+            <h3 id="statProses" class="text-3xl font-bold text-amber-600 mt-1">0</h3>
+          </div>
+          <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-xl">
+            <i class="fa-solid fa-spinner fa-spin-pulse"></i>
+          </div>
+        </div>
+        <p class="text-xs text-slate-400 mt-3">Verifikasi & Dokumen Perjalanan</p>
+      </div>
+
+      <!-- Siap Deportasi -->
+      <div class="bg-white rounded-xl p-5 border border-slate-200/80 shadow-sm hover:shadow-md transition">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Siap Deportasi</p>
+            <h3 id="statSiap" class="text-3xl font-bold text-indigo-600 mt-1">0</h3>
+          </div>
+          <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center text-xl">
+            <i class="fa-solid fa-plane-departure"></i>
+          </div>
+        </div>
+        <p class="text-xs text-slate-400 mt-3">Tiket & Jadwal Tersedia</p>
+      </div>
+
+      <!-- Deportasi Selesai -->
+      <div class="bg-white rounded-xl p-5 border border-slate-200/80 shadow-sm hover:shadow-md transition">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Deportasi Selesai</p>
+            <h3 id="statSelesai" class="text-3xl font-bold text-emerald-600 mt-1">0</h3>
+          </div>
+          <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-xl">
+            <i class="fa-solid fa-circle-check"></i>
+          </div>
+        </div>
+        <p class="text-xs text-slate-400 mt-3">Telah Dideportasi ke Asal</p>
+      </div>
+    </section>
+
+    <!-- FILTER & SEARCH BAR -->
+    <section class="bg-white rounded-xl p-4 border border-slate-200/80 shadow-sm mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+        <!-- Input Cari -->
+        <div class="md:col-span-3 relative">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </span>
+          <input type="text" id="searchInput" oninput="applyFilters()" placeholder="Cari nama, No. Paspor, negara..." class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-immi-blue focus:bg-white transition">
+        </div>
+
+        <!-- Filter Tahun Periode -->
+        <div class="md:col-span-3">
+          <select id="filterTahun" onchange="applyFilters()" class="w-full py-2 px-3 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-immi-blue focus:bg-white transition">
+            <option value="ALL">-- Semua Tahun Periode --</option>
+          </select>
+        </div>
+
+        <!-- Filter Status -->
+        <div class="md:col-span-3">
+          <select id="filterStatus" onchange="applyFilters()" class="w-full py-2 px-3 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-immi-blue focus:bg-white transition">
+            <option value="ALL">-- Semua Status --</option>
+            <option value="Pendataan/Verifikasi">Pendataan / Verifikasi</option>
+            <option value="Proses Dokumen Perjalanan">Proses Dokumen Perjalanan</option>
+            <option value="Menunggu Tiket">Menunggu Tiket</option>
+            <option value="Siap Deportasi">Siap Deportasi</option>
+            <option value="Selesai Pendeportasian">Selesai Pendeportasian</option>
+          </select>
+        </div>
+
+        <!-- Filter Instansi Pengirim -->
+        <div class="md:col-span-3">
+          <select id="filterInstansi" onchange="applyFilters()" class="w-full py-2 px-3 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-immi-blue focus:bg-white transition">
+            <option value="ALL">-- Semua Instansi Pengirim --</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- DATA DETENI TABLE / CARDS -->
+    <section class="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-100 flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+        <h2 class="text-base font-bold text-immi-navy flex items-center gap-2">
+          <i class="fa-solid fa-list-check text-immi-blue"></i>
+          Daftar Monitoring Deteni WNA (SIMPATI)
+        </h2>
+        <span id="dataCountText" class="text-xs font-semibold px-2.5 py-1 bg-slate-100 text-slate-600 rounded-full border border-slate-200">
+          Menampilkan 0 data
+        </span>
+      </div>
+
+      <!-- Desktop Table View -->
+      <div class="hidden lg:block overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-50 text-slate-500 text-xs font-semibold uppercase border-b border-slate-200">
+              <th class="py-3.5 px-4">Identitas Deteni</th>
+              <th class="py-3.5 px-4">Instansi Pengirim</th>
+              <th class="py-3.5 px-4">Pasal Dilanggar</th>
+              <th class="py-3.5 px-4">Lama Didetensi</th>
+              <th class="py-3.5 px-4">Status Deportasi</th>
+              <th class="py-3.5 px-4 text-center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="detaineeTableBody" class="divide-y divide-slate-100 text-sm text-slate-700">
+            <!-- Populated via JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Mobile/Tablet Cards View -->
+      <div id="detaineeCardsBody" class="block lg:hidden divide-y divide-slate-100">
+        <!-- Populated via JS -->
+      </div>
+
+      <!-- Empty State -->
+      <div id="emptyState" class="hidden py-12 text-center">
+        <div class="w-16 h-16 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">
+          <i class="fa-solid fa-folder-open"></i>
+        </div>
+        <p class="text-slate-600 font-medium">Data Deteni tidak ditemukan</p>
+        <p class="text-xs text-slate-400 mt-1">Coba sesuaikan kata kunci atau filter pencarian Anda.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-immi-navy text-slate-400 text-xs py-5 mt-auto border-t border-slate-700">
+    <div class="max-w-7xl mx-auto px-4 text-center flex flex-col sm:flex-row justify-between items-center gap-2">
+      <p>&copy; 2026 SIMPATI - Rumah Detensi Imigrasi Pusat Tanjung Pinang</p>
+      <p class="flex items-center gap-2">
+        <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
+        Sistem Informasi Monitoring Asistensi Pemulangan dan Deportasi
+      </p>
+    </div>
+  </footer>
+
+  <!-- MODALS SECTION -->
+
+  <!-- MODAL 1: DETAIL & RIWAYAT ASISTENSI -->
+  <div id="detailModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl border border-slate-100 overflow-hidden transform transition-all">
+      
+      <div class="bg-immi-navy text-white px-6 py-4 flex items-center justify-between border-b border-immi-gold">
+        <div class="flex items-center gap-3">
+          <i class="fa-solid fa-passport text-immi-gold text-xl"></i>
+          <div>
+            <h3 class="font-bold text-lg leading-tight">Detail Deteni & History Asistensi</h3>
+            <p class="text-xs text-slate-300">SIMPATI - Rudenim Pusat Tanjung Pinang</p>
+          </div>
+        </div>
+        <button onclick="closeModal('detailModal')" class="text-slate-300 hover:text-white text-xl p-1 rounded-lg hover:bg-white/10 transition">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="p-6 overflow-y-auto space-y-6 flex-grow text-slate-800">
+        <div class="bg-slate-50 rounded-xl p-5 border border-slate-200 grid grid-cols-1 md:grid-cols-12 gap-6">
+          <div class="md:col-span-3 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-slate-200 pb-4 md:pb-0 md:pr-4">
+            <img id="detailFoto" src="" alt="Foto Deteni" class="w-32 h-36 object-cover rounded-xl border-2 border-slate-300 shadow-sm mb-2">
+            <span id="detailBadgeStatus" class="mt-2 text-xs font-semibold px-2.5 py-1 rounded-full border">
+              -
+            </span>
+          </div>
+
+          <div class="md:col-span-9 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
+            <div>
+              <p class="text-xs text-slate-500">Nama Lengkap</p>
+              <p id="detailNama" class="font-bold text-slate-900 text-base">-</p>
+            </div>
+            <div>
+              <p class="text-xs text-slate-500">Kewarganegaraan</p>
+              <p id="detailNegara" class="font-semibold text-slate-800 flex items-center gap-1.5">-</p>
+            </div>
+            <div>
+              <p class="text-xs text-slate-500">No. Paspor / Dokumen</p>
+              <p id="detailPaspor" class="font-mono font-medium text-slate-800">-</p>
+            </div>
+            <div>
+              <p class="text-xs text-slate-500">Instansi Pengirim</p>
+              <p id="detailInstansi" class="font-medium text-slate-800">-</p>
+            </div>
+            <div>
+              <p class="text-xs text-slate-500">Pasal yang Dilanggar</p>
+              <p id="detailPasal" class="font-medium text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 inline-block">-</p>
+            </div>
+            <div>
+              <p class="text-xs text-slate-500">Tanggal Masuk / Lama Detensi</p>
+              <p id="detailTglMasuk" class="font-medium text-slate-800">-</p>
+            </div>
+
+            <div class="sm:col-span-2 pt-2 border-t border-slate-200 mt-1 flex flex-wrap items-center justify-between gap-2">
+              <label class="text-xs font-semibold text-slate-700 flex items-center gap-1">
+                <i class="fa-solid fa-pen-to-square text-immi-blue"></i> Ubah Status Deportasi Cepat:
+              </label>
+              <div class="flex items-center gap-2">
+                <select id="quickStatusSelect" class="py-1 px-2.5 bg-white border border-slate-300 rounded-lg text-xs font-medium focus:ring-2 focus:ring-immi-blue outline-none">
+                  <option value="Pendataan/Verifikasi">Pendataan / Verifikasi</option>
+                  <option value="Proses Dokumen Perjalanan">Proses Dokumen Perjalanan</option>
+                  <option value="Menunggu Tiket">Menunggu Tiket</option>
+                  <option value="Siap Deportasi">Siap Deportasi</option>
+                  <option value="Selesai Pendeportasian">Selesai Pendeportasian</option>
+                </select>
+                <button onclick="saveQuickStatus()" class="px-3 py-1 bg-immi-blue hover:bg-blue-700 text-white rounded-lg text-xs font-medium transition shadow-sm">
+                  Simpan Status
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div>
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+            <h4 class="font-bold text-slate-900 text-base flex items-center gap-2">
+              <i class="fa-solid fa-clock-rotate-left text-immi-blue"></i>
+              Riwayat Asistensi Pendeportasian
+            </h4>
+            <div class="flex items-center gap-2">
+              <button onclick="generateAICaseAdvice()" class="bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-lightbulb text-amber-600"></i>
+                <span>Saran Percepatan AI</span>
+              </button>
+              <button onclick="generateAIDraftLetter()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
+                <i class="fa-solid fa-robot text-indigo-600"></i>
+                <span>Buat Draf Surat AI</span>
+              </button>
+              <button onclick="openAddAssistanceModal()" class="bg-immi-blue hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-plus"></i>
+                <span>Tambah Catatan Asistensi</span>
+              </button>
+            </div>
+          </div>
+
+          <div id="assistanceTimeline" class="space-y-4 relative before:absolute before:inset-0 before:left-4 before:w-0.5 before:bg-slate-200">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+      </div>
+
+      <div class="bg-slate-50 px-6 py-3 border-t border-slate-200 flex justify-between items-center">
+        <button onclick="openEditModal(currentDetailId)" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
+          <i class="fa-solid fa-pen-to-square"></i>
+          <span>Edit Profil Deteni</span>
+        </button>
+        <button onclick="closeModal('detailModal')" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-medium transition">
+          Tutup
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL AI REPORT & DRAFT SURAT -->
+  <div id="aiModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-100 overflow-hidden">
+      <div class="bg-gradient-to-r from-immi-navy via-slate-900 to-indigo-950 text-white px-6 py-4 flex items-center justify-between border-b border-immi-gold">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-400">
+            <i class="fa-solid fa-brain text-lg"></i>
+          </div>
+          <div>
+            <h3 id="aiModalTitle" class="font-bold text-lg leading-tight">Analisis AI SIMPATI</h3>
+            <p class="text-xs text-amber-200/80">SIMPATI Rudenim Pusat Tanjung Pinang Automated Intelligence</p>
+          </div>
+        </div>
+        <button onclick="closeModal('aiModal')" class="text-slate-300 hover:text-white text-xl p-1">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="p-6 overflow-y-auto flex-grow space-y-4 text-slate-800">
+        <div id="aiLoading" class="py-12 flex flex-col items-center justify-center space-y-3">
+          <div class="relative w-12 h-12">
+            <div class="absolute inset-0 rounded-full border-4 border-amber-200 animate-ping opacity-75"></div>
+            <div class="w-12 h-12 rounded-full border-4 border-amber-500 border-t-transparent animate-spin"></div>
+          </div>
+          <p class="text-sm font-semibold text-slate-700">Menganalisis data dengan AI SIMPATI...</p>
+          <p class="text-xs text-slate-400 text-center max-w-sm">Memproses histori asistensi, regulasi keimigrasian, dan rekomendasi langkah percepatan.</p>
+        </div>
+
+        <div id="aiResultContent" class="hidden space-y-4">
+          <div class="bg-amber-50/60 border border-amber-200/80 rounded-xl p-4 flex items-start gap-3">
+            <i class="fa-solid fa-circle-info text-amber-600 text-lg mt-0.5"></i>
+            <p class="text-xs text-amber-900 leading-relaxed">
+              Hasil analisis diproses secara otomatis oleh sistem kecerdasan terpadu berbasis data monitoring SIMPATI terkini.
+            </p>
+          </div>
+
+          <div id="aiTextContainer" class="prose prose-sm max-w-none text-slate-800 bg-slate-50 p-5 rounded-xl border border-slate-200 font-sans text-sm leading-relaxed space-y-3 whitespace-pre-line">
+            <!-- Output AI -->
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-slate-50 px-6 py-3 border-t border-slate-200 flex justify-between items-center">
+        <button onclick="copyAiOutput()" class="px-3.5 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
+          <i class="fa-regular fa-copy"></i>
+          <span>Salin Teks</span>
+        </button>
+        <button onclick="closeModal('aiModal')" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-medium transition">
+          Selesai
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: TAMBAH / EDIT CATATAN ASISTENSI -->
+  <div id="addAssistanceModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-xl max-w-lg w-full shadow-2xl border border-slate-100 overflow-hidden transform transition-all">
+      <div class="bg-immi-navy text-white px-5 py-3.5 flex items-center justify-between">
+        <h3 id="assistModalTitle" class="font-bold text-base flex items-center gap-2">
+          <i class="fa-solid fa-file-pen text-immi-gold"></i>
+          Catat Asistensi Baru
+        </h3>
+        <button onclick="closeModal('addAssistanceModal')" class="text-slate-300 hover:text-white">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="formAddAssistance" onsubmit="saveAssistance(event)" class="p-5 space-y-4">
+        <input type="hidden" id="assistDetaineeId">
+        <input type="hidden" id="assistEditIndex" value="-1">
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Asistensi Ke- *</label>
+            <input type="number" id="assistKe" min="1" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-immi-blue focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Tanggal Asistensi *</label>
+            <input type="date" id="assistTanggal" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-immi-blue focus:outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Petugas Asistensi *</label>
+          <input type="text" id="assistPetugas" placeholder="Contoh: Budi Santoso (Seksi Regstatus)" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-immi-blue focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Hasil Asistensi / Temuan *</label>
+          <textarea id="assistHasil" rows="3" placeholder="Jelaskan perkembangan komunikasi dengan kedubes, verifikasi data, atau hambatan..." required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-immi-blue focus:outline-none"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Tindak Lanjut *</label>
+          <textarea id="assistTindakLanjut" rows="2" placeholder="Langkah berikutnya yang harus dilakukan petugas..." required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-immi-blue focus:outline-none"></textarea>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
+          <button type="button" onclick="closeModal('addAssistanceModal')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium transition">
+            Batal
+          </button>
+          <button type="submit" class="px-4 py-2 bg-immi-blue hover:bg-blue-700 text-white rounded-lg text-xs font-medium transition">
+            Simpan Asistensi
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 3: TAMBAH / EDIT DETENI -->
+  <div id="detaineeModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[92vh] flex flex-col shadow-2xl border border-slate-100 overflow-hidden transform transition-all">
+      
+      <div class="bg-immi-navy text-white px-6 py-4 flex items-center justify-between border-b border-immi-gold">
+        <h3 id="detaineeModalTitle" class="font-bold text-lg flex items-center gap-2">
+          <i class="fa-solid fa-user-plus text-immi-gold"></i>
+          Tambah Data Deteni Baru
+        </h3>
+        <button onclick="closeModal('detaineeModal')" class="text-slate-300 hover:text-white text-xl">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="formDetainee" onsubmit="saveDetainee(event)" class="p-6 overflow-y-auto space-y-4 flex-grow text-slate-800">
+        <input type="hidden" id="editId" value="">
+        <input type="hidden" id="formFotoBase64" value="">
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap Deteni *</label>
+            <input type="text" id="formNama" required placeholder="Sesuai Paspor / BAP" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-immi-blue focus:bg-white focus:outline-none transition">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Kewarganegaraan / Asal *</label>
+            <input type="text" id="formNegara" required placeholder="Contoh: Vietnam" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-immi-blue focus:bg-white focus:outline-none transition">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">No. Paspor / SPLP / Dokumen *</label>
+            <input type="text" id="formPaspor" required placeholder="Nomor paspor atau SPLP" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-immi-blue focus:bg-white focus:outline-none transition">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Instansi Pengirim *</label>
+            <input type="text" id="formInstansi" required placeholder="Contoh: Kanim Kelas I TPI Tanjungpinang" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-immi-blue focus:bg-white focus:outline-none transition">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Pasal Pelanggaran Keimigrasian *</label>
+            <input type="text" id="formPasal" required placeholder="Contoh: Pasal 75 ayat 1 UU No. 6/2011" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-immi-blue focus:bg-white focus:outline-none transition">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Tanggal Masuk Rudenim *</label>
+            <input type="date" id="formTglMasuk" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-immi-blue focus:bg-white focus:outline-none transition">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Status Tahapan Deportasi *</label>
+          <select id="formStatus" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-immi-blue focus:bg-white focus:outline-none transition">
+            <option value="Pendataan/Verifikasi">Pendataan / Verifikasi</option>
+            <option value="Proses Dokumen Perjalanan">Proses Dokumen Perjalanan</option>
+            <option value="Menunggu Tiket">Menunggu Tiket</option>
+            <option value="Siap Deportasi">Siap Deportasi</option>
+            <option value="Selesai Pendeportasian">Selesai Pendeportasian</option>
+          </select>
+        </div>
+
+        <!-- Upload Foto dari PC -->
+        <div class="border-t border-slate-200 pt-3">
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Upload Foto Diri (Dari PC / Device)</label>
+          <input type="file" id="formFotoFile" accept="image/*" onchange="handleImageUpload(event)" class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-immi-blue file:text-white hover:file:bg-blue-700 transition cursor-pointer">
+          <p class="text-[11px] text-slate-400 mt-1">Format JPG/PNG/WEBP, maksimal 3 MB.</p>
+          
+          <div id="photoPreviewContainer" class="hidden mt-3 flex items-center gap-3 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+            <img id="photoPreview" src="" alt="Pratinjau Foto" class="w-16 h-20 object-cover rounded-lg border border-slate-300 shadow-sm">
+            <div class="flex-grow">
+              <p class="text-xs font-semibold text-slate-800">Foto Diri Terpilih</p>
+              <button type="button" onclick="removeUploadedPhoto()" class="text-xs text-rose-600 hover:text-rose-800 font-medium mt-1 inline-flex items-center gap-1">
+                <i class="fa-solid fa-trash text-[10px]"></i> Hapus Foto
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-200">
+          <button type="button" onclick="closeModal('detaineeModal')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition">
+            Batal
+          </button>
+          <button type="submit" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold transition shadow">
+            Simpan Data Deteni
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 4: KONFIRMASI HAPUS DETENI -->
+  <div id="deleteConfirmModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 text-center space-y-4 transform transition-all">
+      <div class="w-14 h-14 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto text-2xl shadow-inner">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <div>
+        <h3 class="text-lg font-bold text-slate-900">Konfirmasi Hapus Data</h3>
+        <p class="text-xs text-slate-500 mt-1">Apakah Anda yakin ingin menghapus data deteni berikut dari SIMPATI?</p>
+        <p id="deleteDetaineeName" class="text-sm font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-lg p-2 mt-2 break-all">-</p>
+      </div>
+      <div class="flex justify-center gap-3 pt-2">
+        <button onclick="closeModal('deleteConfirmModal')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition">
+          Batal
+        </button>
+        <button id="btnConfirmDelete" onclick="confirmDeleteDetaineeAction()" class="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-semibold shadow transition">
+          Ya, Hapus Data
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    const STORAGE_KEY = 'SIMPATI_DETAINEES_DATA_V1';
+
+    function saveToLocalStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(detainees));
+      } catch (e) {
+        console.error('Failed to save to local storage:', e);
+      }
+    }
+
+    const INITIAL_SAMPLE_DATA = [
+      {
+        id: 'DET-2026-001',
+        nama: 'Nguyen Van Minh',
+        negara: 'Vietnam',
+        paspor: 'C8392019',
+        instansi: 'Kanim Kelas I TPI Tanjungpinang',
+        pasal: 'Pasal 75 ayat 1 UU No. 6/2011',
+        tglMasuk: '2026-01-10',
+        status: 'Proses Dokumen Perjalanan',
+        foto: '',
+        asistensi: [
+          {
+            ke: 1,
+            tanggal: '2026-01-15',
+            petugas: 'Rahmat Hidayat (Seksi Regstatus)',
+            hasil: 'Pemeriksaan identitas awal dan BAP. Deteni kooperatif namun tidak memegang dokumen perjalanan asli.',
+            tindakLanjut: 'Kirim surat koordinasi awal ke Kedubes Vietnam di Jakarta untuk verifikasi kewarganegaraan.'
+          },
+          {
+            ke: 2,
+            tanggal: '2026-02-02',
+            petugas: 'Siti Rahma (Seksi Pemulangan)',
+            hasil: 'Pihak Kedubes Vietnam telah mengonfirmasi kewarganegaraan dan meminta melengkapi form permohonan Pas Jalan.',
+            tindakLanjut: 'Pengisian formulir dan verifikasi pasfoto deteni untuk pengurusan Travel Document.'
+          }
+        ]
+      },
+      {
+        id: 'DET-2026-002',
+        nama: 'Chen Wei',
+        negara: 'China',
+        paspor: 'E9812401',
+        instansi: 'Kanim Kelas II TPI Belakang Padang',
+        pasal: 'Pasal 119 ayat 1 UU No. 6/2011',
+        tglMasuk: '2025-11-20',
+        status: 'Siap Deportasi',
+        foto: '',
+        asistensi: [
+          {
+            ke: 1,
+            tanggal: '2025-12-01',
+            petugas: 'Dedi Kurniawan',
+            hasil: 'Koordinasi dengan sponsor dan penjamin keluarga di Beijing.',
+            tindakLanjut: 'Menunggu pembelian tiket penerbangan pulang.'
+          },
+          {
+            ke: 2,
+            tanggal: '2026-01-25',
+            petugas: 'Dedi Kurniawan',
+            hasil: 'Tiket penerbangan penerbangan Jakarta - Beijing telah terbit tanggal 20 Februari 2026.',
+            tindakLanjut: 'Persiapan pengawalan menuju Bandara Soekarno-Hatta.'
+          }
+        ]
+      },
+      {
+        id: 'DET-2026-003',
+        nama: 'John Edward Doe',
+        negara: 'Australia',
+        paspor: 'N1029384',
+        instansi: 'Kanim Kelas I Khusus TPI Batam',
+        pasal: 'Pasal 78 ayat 3 UU No. 6/2011 (Overstay)',
+        tglMasuk: '2026-02-01',
+        status: 'Pendataan/Verifikasi',
+        foto: '',
+        asistensi: [
+          {
+            ke: 1,
+            tanggal: '2026-02-03',
+            petugas: 'Hendrik Wijaya',
+            hasil: 'Deteni telah overstay melebihi 60 hari. Paspor masih berlaku.',
+            tindakLanjut: 'Koordinasi dengan Konsulat Australia untuk penyelesaian administrasi dan pembayaran mandiri tiket.'
+          }
+        ]
+      }
+    ];
+
+    var detainees = [];
+    var currentDetailId = null;
+    var detaineeIdToDelete = null;
+
+    function deleteDetainee(id) {
+      if (!detainees || detainees.length === 0) return;
+      const d = detainees.find(item => item.id === id);
+      if (!d) return;
+
+      detaineeIdToDelete = id;
+      const delElem = document.getElementById('deleteDetaineeName');
+      if (delElem) delElem.innerText = `${d.nama} (${d.id})`;
+      const modal = document.getElementById('deleteConfirmModal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function confirmDeleteDetaineeAction() {
+      if (!detaineeIdToDelete) return;
+
+      const id = detaineeIdToDelete;
+      const d = detainees.find(item => item.id === id);
+      const detaineeName = d ? d.nama : id;
+
+      detainees = detainees.filter(item => item.id !== id);
+
+      saveToLocalStorage();
+      populateDropdownFilters();
+      renderDashboard();
+
+      if (currentDetailId === id) {
+        closeModal('detailModal');
+        currentDetailId = null;
+      }
+      closeModal('deleteConfirmModal');
+      detaineeIdToDelete = null;
+
+      showToast(`Data deteni ${detaineeName} berhasil dihapus.`);
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '-';
+      try {
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return dateStr;
+        return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+      } catch (e) {
+        return dateStr;
+      }
+    }
+
+    function calculateDetentionDuration(tglMasukStr) {
+      if (!tglMasukStr) return '0 Hari';
+      try {
+        const start = new Date(tglMasukStr);
+        const now = new Date();
+        const diffTime = Math.abs(now - start);
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        
+        if (diffDays === 0) return 'Hari ini (1 Hari)';
+        if (diffDays < 30) return `${diffDays} Hari`;
+        
+        const months = Math.floor(diffDays / 30);
+        const remDays = diffDays % 30;
+        return remDays > 0 ? `${months} Bln ${remDays} Hri (${diffDays} Hari)` : `${months} Bulan (${diffDays} Hari)`;
+      } catch (e) {
+        return '-';
+      }
+    }
+
+    function getStatusBadgeHTML(status) {
+      let colorClasses = 'bg-slate-100 text-slate-700 border-slate-300';
+      let icon = 'fa-circle-dot';
+
+      if (status === 'Pendataan/Verifikasi') {
+        colorClasses = 'bg-slate-100 text-slate-700 border-slate-300';
+        icon = 'fa-clipboard-check';
+      } else if (status === 'Proses Dokumen Perjalanan') {
+        colorClasses = 'bg-amber-50 text-amber-800 border-amber-300';
+        icon = 'fa-passport';
+      } else if (status === 'Menunggu Tiket') {
+        colorClasses = 'bg-sky-50 text-sky-800 border-sky-300';
+        icon = 'fa-ticket';
+      } else if (status === 'Siap Deportasi') {
+        colorClasses = 'bg-indigo-50 text-indigo-800 border-indigo-300';
+        icon = 'fa-plane-departure';
+      } else if (status === 'Selesai Pendeportasian') {
+        colorClasses = 'bg-emerald-50 text-emerald-800 border-emerald-300';
+        icon = 'fa-circle-check';
+      }
+
+      return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-full border ${colorClasses}">
+        <i class="fa-solid ${icon} text-[10px]"></i> ${status}
+      </span>`;
+    }
+
+    function applyFilters() {
+      renderDashboard();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadDataFromStorage();
+      populateDropdownFilters();
+      renderDashboard();
+    });
+
+    function loadDataFromStorage() {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          detainees = JSON.parse(stored);
+        } else {
+          detainees = [...INITIAL_SAMPLE_DATA];
+          saveToLocalStorage();
+        }
+      } catch (e) {
+        console.error('Failed to load local storage:', e);
+        detainees = [...INITIAL_SAMPLE_DATA];
+      }
+    }
+
+    function populateDropdownFilters() {
+      populateInstansiFilter();
+      populateTahunFilter();
+    }
+
+    function populateTahunFilter() {
+      const select = document.getElementById('filterTahun');
+      if (!select || !detainees) return;
+
+      const years = [...new Set(detainees.map(d => {
+        if (!d.tglMasuk) return null;
+        return new Date(d.tglMasuk).getFullYear();
+      }).filter(Boolean))].sort((a, b) => b - a);
+
+      const currentSelected = select.value || 'ALL';
+      select.innerHTML = `<option value="ALL">-- Semua Tahun Periode --</option>` +
+        years.map(yr => `<option value="${yr}">${yr}</option>`).join('');
+      select.value = currentSelected;
+    }
+
+    function renderDashboard() {
+      if (!detainees) detainees = [];
+      const tbody = document.getElementById('detaineeTableBody');
+      const cardsBody = document.getElementById('detaineeCardsBody');
+      const emptyState = document.getElementById('emptyState');
+      
+      const searchVal = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+      const statusVal = document.getElementById('filterStatus')?.value || 'ALL';
+      const instansiVal = document.getElementById('filterInstansi')?.value || 'ALL';
+      const tahunVal = document.getElementById('filterTahun')?.value || 'ALL';
+
+      const filtered = detainees.filter(item => {
+        const matchSearch = (item.nama || '').toLowerCase().includes(searchVal) || 
+                            (item.negara || '').toLowerCase().includes(searchVal) || 
+                            (item.paspor || '').toLowerCase().includes(searchVal) ||
+                            (item.id || '').toLowerCase().includes(searchVal);
+        const matchStatus = statusVal === 'ALL' || item.status === statusVal;
+        const matchInstansi = instansiVal === 'ALL' || item.instansi === instansiVal;
+
+        let matchTahun = true;
+        if (tahunVal !== 'ALL' && item.tglMasuk) {
+          const itemYear = new Date(item.tglMasuk).getFullYear().toString();
+          matchTahun = itemYear === tahunVal.toString();
+        }
+
+        return matchSearch && matchStatus && matchInstansi && matchTahun;
+      });
+
+      if (document.getElementById('statTotal')) document.getElementById('statTotal').innerText = filtered.length;
+      if (document.getElementById('statProses')) document.getElementById('statProses').innerText = filtered.filter(d => d.status === 'Pendataan/Verifikasi' || d.status === 'Proses Dokumen Perjalanan' || d.status === 'Menunggu Tiket').length;
+      if (document.getElementById('statSiap')) document.getElementById('statSiap').innerText = filtered.filter(d => d.status === 'Siap Deportasi').length;
+      if (document.getElementById('statSelesai')) document.getElementById('statSelesai').innerText = filtered.filter(d => d.status === 'Selesai Pendeportasian').length;
+      if (document.getElementById('dataCountText')) document.getElementById('dataCountText').innerText = `Menampilkan ${filtered.length} dari ${detainees.length} data`;
+
+      if (filtered.length === 0) {
+        if (tbody) tbody.innerHTML = '';
+        if (cardsBody) cardsBody.innerHTML = '';
+        if (emptyState) emptyState.classList.remove('hidden');
+        return;
+      }
+
+      if (emptyState) emptyState.classList.add('hidden');
+
+      if (tbody) {
+        tbody.innerHTML = filtered.map(item => {
+          const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(item.nama || 'Deteni')}&background=0A2540&color=D4AF37&size=128&bold=true`;
+          const photoUrl = item.foto || defaultAvatar;
+          const duration = calculateDetentionDuration(item.tglMasuk);
+          const asistensiCount = item.asistensi ? item.asistensi.length : 0;
+
+          return `
+            <tr class="hover:bg-slate-50/80 transition border-b border-slate-100">
+              <td class="py-3.5 px-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-12 h-14 rounded-lg bg-immi-navy/10 border border-slate-200 overflow-hidden flex-shrink-0 flex items-center justify-center relative shadow-sm">
+                    <img src="${photoUrl}" alt="${item.nama}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='${defaultAvatar}';">
+                  </div>
+                  <div>
+                    <p class="font-bold text-slate-900">${item.nama}</p>
+                    <p class="text-xs text-slate-500 flex items-center gap-1.5 mt-0.5">
+                      <span class="font-semibold text-slate-700">${item.negara}</span> • No. Paspor: <span class="font-mono">${item.paspor}</span>
+                    </p>
+                    <span class="inline-block text-[10px] bg-slate-100 text-slate-500 font-mono px-1.5 py-0.5 rounded mt-1">${item.id}</span>
+                  </div>
+                </div>
+              </td>
+              <td class="py-3.5 px-4">
+                <p class="font-medium text-slate-800 text-xs">${item.instansi}</p>
+                <p class="text-[11px] text-slate-400 mt-0.5">Masuk: ${formatDate(item.tglMasuk)}</p>
+              </td>
+              <td class="py-3.5 px-4">
+                <span class="text-xs font-medium text-amber-800 bg-amber-50 border border-amber-200/80 px-2.5 py-1 rounded-md inline-block">
+                  ${item.pasal}
+                </span>
+              </td>
+              <td class="py-3.5 px-4">
+                <p class="font-bold text-slate-800 text-xs">${duration}</p>
+                <p class="text-[11px] text-immi-blue font-semibold mt-0.5"><i class="fa-solid fa-clock-rotate-left"></i> ${asistensiCount} Asistensi</p>
+              </td>
+              <td class="py-3.5 px-4">
+                ${getStatusBadgeHTML(item.status)}
+              </td>
+              <td class="py-3.5 px-4 text-center">
+                <div class="flex items-center justify-center gap-1.5">
+                  <button onclick="openDetailModal('${item.id}')" title="Lihat Detail & Asistensi" class="p-2 bg-blue-50 text-immi-blue hover:bg-immi-blue hover:text-white rounded-lg transition text-xs font-medium flex items-center gap-1">
+                    <i class="fa-solid fa-eye"></i> Detail
+                  </button>
+                  <button onclick="openEditModal('${item.id}')" title="Edit Profil Deteni" class="p-2 bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900 rounded-lg transition text-xs">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                  </button>
+                  <button onclick="deleteDetainee('${item.id}')" title="Hapus Data" class="p-2 bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white rounded-lg transition text-xs">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      if (cardsBody) {
+        cardsBody.innerHTML = filtered.map(item => {
+          const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(item.nama || 'Deteni')}&background=0A2540&color=D4AF37&size=128&bold=true`;
+          const photoUrl = item.foto || defaultAvatar;
+          const duration = calculateDetentionDuration(item.tglMasuk);
+
+          return `
+            <div class="p-4 hover:bg-slate-50 transition space-y-3">
+              <div class="flex items-start gap-3">
+                <div class="w-14 h-16 rounded-lg bg-immi-navy/10 border border-slate-200 overflow-hidden flex-shrink-0 flex items-center justify-center relative shadow-sm">
+                  <img src="${photoUrl}" alt="${item.nama}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='${defaultAvatar}';">
+                </div>
+                <div class="flex-grow min-w-0">
+                  <div class="flex items-center justify-between">
+                    <p class="font-bold text-slate-900 text-base truncate">${item.nama}</p>
+                    <span class="text-[10px] bg-slate-100 text-slate-600 font-mono px-1.5 py-0.5 rounded">${item.id}</span>
+                  </div>
+                  <p class="text-xs text-slate-600 mt-0.5">${item.negara} • <span class="font-mono">${item.paspor}</span></p>
+                  <div class="mt-2">
+                    ${getStatusBadgeHTML(item.status)}
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200/60 text-xs space-y-1">
+                <p><span class="text-slate-500">Pengirim:</span> <span class="font-medium text-slate-800">${item.instansi}</span></p>
+                <p><span class="text-slate-500">Pasal:</span> <span class="font-medium text-amber-800">${item.pasal}</span></p>
+                <p><span class="text-slate-500">Lama Didetensi:</span> <span class="font-bold text-slate-800">${duration}</span> (${formatDate(item.tglMasuk)})</p>
+              </div>
+
+              <div class="flex items-center justify-end gap-2 pt-1">
+                <button onclick="openDetailModal('${item.id}')" class="px-3 py-1.5 bg-immi-blue text-white rounded-lg text-xs font-semibold flex items-center gap-1">
+                  <i class="fa-solid fa-eye"></i> Detail & Asistensi
+                </button>
+                <button onclick="openEditModal('${item.id}')" class="p-1.5 bg-slate-100 text-slate-700 rounded-lg text-xs">
+                  <i class="fa-solid fa-pen"></i>
+                </button>
+                <button onclick="deleteDetainee('${item.id}')" class="p-1.5 bg-rose-50 text-rose-600 rounded-lg text-xs">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    function populateInstansiFilter() {
+      const select = document.getElementById('filterInstansi');
+      if (!select || !detainees) return;
+      const instansiList = [...new Set(detainees.map(d => d.instansi).filter(Boolean))];
+      const currentSelected = select.value || 'ALL';
+      select.innerHTML = `<option value="ALL">-- Semua Instansi Pengirim --</option>` +
+        instansiList.map(i => `<option value="${i}">${i}</option>`).join('');
+      select.value = currentSelected;
+    }
+
+    function openDetailModal(id) {
+      currentDetailId = id;
+      const d = detainees.find(item => item.id === id);
+      if (!d) return;
+
+      const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(d.nama || 'Deteni')}&background=0A2540&color=fff&size=128`;
+      
+      const fotoElem = document.getElementById('detailFoto');
+      if (fotoElem) fotoElem.src = d.foto || defaultAvatar;
+      if (document.getElementById('detailNama')) document.getElementById('detailNama').innerText = d.nama;
+      if (document.getElementById('detailNegara')) document.getElementById('detailNegara').innerText = d.negara;
+      if (document.getElementById('detailPaspor')) document.getElementById('detailPaspor').innerText = d.paspor;
+      if (document.getElementById('detailInstansi')) document.getElementById('detailInstansi').innerText = d.instansi;
+      if (document.getElementById('detailPasal')) document.getElementById('detailPasal').innerText = d.pasal;
+      if (document.getElementById('detailTglMasuk')) document.getElementById('detailTglMasuk').innerText = `${formatDate(d.tglMasuk)} (${calculateDetentionDuration(d.tglMasuk)})`;
+      if (document.getElementById('detailBadgeStatus')) document.getElementById('detailBadgeStatus').innerHTML = getStatusBadgeHTML(d.status);
+      if (document.getElementById('quickStatusSelect')) document.getElementById('quickStatusSelect').value = d.status;
+
+      renderAssistanceTimeline(d);
+
+      const modal = document.getElementById('detailModal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function renderAssistanceTimeline(detainee) {
+      const timelineContainer = document.getElementById('assistanceTimeline');
+      if (!timelineContainer) return;
+
+      if (!detainee.asistensi || detainee.asistensi.length === 0) {
+        timelineContainer.innerHTML = `
+          <div class="pl-8 py-4 text-slate-400 text-xs italic">
+            Belum ada catatan riwayat asistensi untuk deteni ini. Silakan tambahkan catatan baru.
+          </div>
+        `;
+        return;
+      }
+
+      timelineContainer.innerHTML = detainee.asistensi.map((ast, idx) => `
+        <div class="relative pl-8 group">
+          <div class="absolute left-2.5 top-1.5 w-3 h-3 rounded-full bg-immi-blue border-2 border-white ring-2 ring-blue-100"></div>
+          <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-4 hover:bg-blue-50/20 transition space-y-2">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200/60 pb-2">
+              <span class="text-xs font-bold text-immi-blue bg-blue-100/80 px-2.5 py-0.5 rounded-md">
+                Asistensi Ke-${ast.ke}
+              </span>
+              <div class="flex items-center gap-3">
+                <span class="text-xs text-slate-500 font-medium">
+                  <i class="fa-regular fa-calendar mr-1"></i>${formatDate(ast.tanggal)}
+                </span>
+                <div class="flex items-center gap-1">
+                  <button onclick="openEditAssistanceModal(${idx})" title="Edit Catatan" class="text-slate-400 hover:text-immi-blue p-1 rounded transition text-xs">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                  </button>
+                  <button onclick="deleteAssistance(${idx})" title="Hapus Catatan" class="text-slate-400 hover:text-rose-600 p-1 rounded transition text-xs">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <p class="text-xs font-semibold text-slate-600">Petugas Asistensi:</p>
+              <p class="text-xs text-slate-800 font-medium">${ast.petugas || '-'}</p>
+            </div>
+
+            <div>
+              <p class="text-xs font-semibold text-slate-600">Hasil / Temuan:</p>
+              <p class="text-xs text-slate-700 leading-relaxed bg-white p-2.5 rounded-lg border border-slate-200/60 mt-0.5">${ast.hasil || '-'}</p>
+            </div>
+
+            <div>
+              <p class="text-xs font-semibold text-amber-800 flex items-center gap-1">
+                <i class="fa-solid fa-arrow-right-long"></i> Tindak Lanjut:
+              </p>
+              <p class="text-xs text-slate-700 font-medium mt-0.5">${ast.tindakLanjut || '-'}</p>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function saveQuickStatus() {
+      if (!currentDetailId) return;
+      const select = document.getElementById('quickStatusSelect');
+      if (!select) return;
+      const newStatus = select.value;
+
+      const idx = detainees.findIndex(d => d.id === currentDetailId);
+      if (idx !== -1) {
+        detainees[idx].status = newStatus;
+        saveToLocalStorage();
+        renderDashboard();
+        openDetailModal(currentDetailId);
+        showToast(`Status berhasil diperbarui menjadi '${newStatus}'.`);
+      }
+    }
+
+    // SAFELY OPEN ADD MODAL
+    function openAddModal() {
+      const editIdElem = document.getElementById('editId');
+      if (editIdElem) editIdElem.value = '';
+
+      const modalTitle = document.getElementById('detaineeModalTitle');
+      if (modalTitle) modalTitle.innerText = 'Tambah Data Deteni Baru';
+
+      const form = document.getElementById('formDetainee');
+      if (form) form.reset();
+
+      const fotoBase64Elem = document.getElementById('formFotoBase64');
+      if (fotoBase64Elem) fotoBase64Elem.value = '';
+
+      const photoContainer = document.getElementById('photoPreviewContainer');
+      if (photoContainer) photoContainer.classList.add('hidden');
+
+      const modal = document.getElementById('detaineeModal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    // SAFELY OPEN EDIT MODAL
+    function openEditModal(id) {
+      const d = detainees.find(item => item.id === id);
+      if (!d) return;
+
+      if (document.getElementById('editId')) document.getElementById('editId').value = d.id;
+      if (document.getElementById('detaineeModalTitle')) document.getElementById('detaineeModalTitle').innerText = `Edit Data Deteni (${d.id})`;
+      if (document.getElementById('formNama')) document.getElementById('formNama').value = d.nama || '';
+      if (document.getElementById('formNegara')) document.getElementById('formNegara').value = d.negara || '';
+      if (document.getElementById('formPaspor')) document.getElementById('formPaspor').value = d.paspor || '';
+      if (document.getElementById('formInstansi')) document.getElementById('formInstansi').value = d.instansi || '';
+      if (document.getElementById('formPasal')) document.getElementById('formPasal').value = d.pasal || '';
+      if (document.getElementById('formTglMasuk')) document.getElementById('formTglMasuk').value = d.tglMasuk || '';
+      if (document.getElementById('formStatus')) document.getElementById('formStatus').value = d.status || 'Pendataan/Verifikasi';
+      
+      if (document.getElementById('formFotoBase64')) document.getElementById('formFotoBase64').value = d.foto || '';
+      
+      const photoContainer = document.getElementById('photoPreviewContainer');
+      const photoPreview = document.getElementById('photoPreview');
+      if (d.foto && photoPreview && photoContainer) {
+        photoPreview.src = d.foto;
+        photoContainer.classList.remove('hidden');
+      } else if (photoContainer) {
+        photoContainer.classList.add('hidden');
+      }
+
+      const modal = document.getElementById('detaineeModal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function handleImageUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      if (file.size > 3 * 1024 * 1024) {
+        alert('Ukuran file foto terlalu besar. Maksimal 3 MB.');
+        e.target.value = '';
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const base64 = evt.target.result;
+        if (document.getElementById('formFotoBase64')) document.getElementById('formFotoBase64').value = base64;
+        if (document.getElementById('photoPreview')) document.getElementById('photoPreview').src = base64;
+        if (document.getElementById('photoPreviewContainer')) document.getElementById('photoPreviewContainer').classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removeUploadedPhoto() {
+      if (document.getElementById('formFotoFile')) document.getElementById('formFotoFile').value = '';
+      if (document.getElementById('formFotoBase64')) document.getElementById('formFotoBase64').value = '';
+      if (document.getElementById('photoPreviewContainer')) document.getElementById('photoPreviewContainer').classList.add('hidden');
+    }
+
+    function saveDetainee(e) {
+      e.preventDefault();
+      if (!detainees) detainees = [];
+
+      const editId = document.getElementById('editId')?.value || '';
+
+      const formData = {
+        nama: document.getElementById('formNama')?.value || '',
+        negara: document.getElementById('formNegara')?.value || '',
+        paspor: document.getElementById('formPaspor')?.value || '',
+        instansi: document.getElementById('formInstansi')?.value || '',
+        pasal: document.getElementById('formPasal')?.value || '',
+        tglMasuk: document.getElementById('formTglMasuk')?.value || '',
+        status: document.getElementById('formStatus')?.value || 'Pendataan/Verifikasi',
+        foto: document.getElementById('formFotoBase64')?.value || ''
+      };
+
+      if (editId) {
+        const index = detainees.findIndex(d => d.id === editId);
+        if (index !== -1) {
+          detainees[index] = { ...detainees[index], ...formData };
+          showToast(`Data deteni ${formData.nama} berhasil diperbarui.`);
+        }
+      } else {
+        const year = new Date(formData.tglMasuk).getFullYear() || new Date().getFullYear();
+        const newId = `DET-${year}-${String(detainees.length + 1).padStart(3, '0')}`;
+        detainees.unshift({
+          id: newId,
+          ...formData,
+          asistensi: []
+        });
+        showToast(`Deteni baru ${formData.nama} berhasil ditambahkan ke SIMPATI.`);
+      }
+
+      saveToLocalStorage();
+      populateDropdownFilters();
+      renderDashboard();
+      closeModal('detaineeModal');
+
+      if (currentDetailId === editId && editId !== '') {
+        openDetailModal(editId);
+      }
+    }
+
+    function openAddAssistanceModal() {
+      if (!currentDetailId) return;
+      const d = detainees.find(item => item.id === currentDetailId);
+      if (!d) return;
+
+      if (document.getElementById('assistModalTitle')) document.getElementById('assistModalTitle').innerText = 'Catat Asistensi Baru';
+      if (document.getElementById('assistDetaineeId')) document.getElementById('assistDetaineeId').value = currentDetailId;
+      if (document.getElementById('assistEditIndex')) document.getElementById('assistEditIndex').value = '-1';
+      
+      const form = document.getElementById('formAddAssistance');
+      if (form) form.reset();
+
+      const nextKe = (d.asistensi ? d.asistensi.length : 0) + 1;
+      if (document.getElementById('assistKe')) document.getElementById('assistKe').value = nextKe;
+      if (document.getElementById('assistTanggal')) document.getElementById('assistTanggal').value = new Date().toISOString().split('T')[0];
+
+      const modal = document.getElementById('addAssistanceModal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function openEditAssistanceModal(index) {
+      if (!currentDetailId) return;
+      const d = detainees.find(item => item.id === currentDetailId);
+      if (!d || !d.asistensi || !d.asistensi[index]) return;
+
+      const ast = d.asistensi[index];
+      if (document.getElementById('assistModalTitle')) document.getElementById('assistModalTitle').innerText = `Edit Asistensi Ke-${ast.ke}`;
+      if (document.getElementById('assistDetaineeId')) document.getElementById('assistDetaineeId').value = currentDetailId;
+      if (document.getElementById('assistEditIndex')) document.getElementById('assistEditIndex').value = index;
+      if (document.getElementById('assistKe')) document.getElementById('assistKe').value = ast.ke;
+      if (document.getElementById('assistTanggal')) document.getElementById('assistTanggal').value = ast.tanggal;
+      if (document.getElementById('assistPetugas')) document.getElementById('assistPetugas').value = ast.petugas || '';
+      if (document.getElementById('assistHasil')) document.getElementById('assistHasil').value = ast.hasil || '';
+      if (document.getElementById('assistTindakLanjut')) document.getElementById('assistTindakLanjut').value = ast.tindakLanjut || '';
+
+      const modal = document.getElementById('addAssistanceModal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function saveAssistance(e) {
+      e.preventDefault();
+      const detId = document.getElementById('assistDetaineeId')?.value;
+      const editIdx = parseInt(document.getElementById('assistEditIndex')?.value || '-1');
+
+      const dIndex = detainees.findIndex(d => d.id === detId);
+      if (dIndex === -1) return;
+
+      if (!detainees[dIndex].asistensi) detainees[dIndex].asistensi = [];
+
+      const assistObj = {
+        ke: parseInt(document.getElementById('assistKe')?.value || '1'),
+        tanggal: document.getElementById('assistTanggal')?.value || '',
+        petugas: document.getElementById('assistPetugas')?.value || '',
+        hasil: document.getElementById('assistHasil')?.value || '',
+        tindakLanjut: document.getElementById('assistTindakLanjut')?.value || ''
+      };
+
+      if (editIdx >= 0 && editIdx < detainees[dIndex].asistensi.length) {
+        detainees[dIndex].asistensi[editIdx] = assistObj;
+        showToast(`Catatan Asistensi Ke-${assistObj.ke} diperbarui.`);
+      } else {
+        detainees[dIndex].asistensi.push(assistObj);
+        showToast(`Catatan Asistensi Ke-${assistObj.ke} berhasil ditambahkan.`);
+      }
+
+      detainees[dIndex].asistensi.sort((a, b) => a.ke - b.ke);
+
+      saveToLocalStorage();
+      renderDashboard();
+      openDetailModal(detId);
+      closeModal('addAssistanceModal');
+    }
+
+    function deleteAssistance(index) {
+      if (!currentDetailId) return;
+      const dIndex = detainees.findIndex(d => d.id === currentDetailId);
+      if (dIndex === -1 || !detainees[dIndex].asistensi) return;
+
+      if (confirm('Apakah Anda yakin ingin menghapus catatan asistensi ini?')) {
+        detainees[dIndex].asistensi.splice(index, 1);
+        saveToLocalStorage();
+        renderDashboard();
+        openDetailModal(currentDetailId);
+        showToast('Catatan asistensi berhasil dihapus.');
+      }
+    }
+
+    function closeModal(modalId) {
+      const m = document.getElementById(modalId);
+      if (m) m.classList.add('hidden');
+    }
+
+    async function callGeminiApi(userQuery, systemPrompt, maxRetries = 3) {
+      const apiKey = "";
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+      const payload = {
+        contents: [{ parts: [{ text: userQuery }] }],
+        systemInstruction: { parts: [{ text: systemPrompt }] }
+      };
+
+      let delay = 1000;
+      for (let attempt = 0; attempt < maxRetries; attempt++) {
+        try {
+          const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+          const result = await response.json();
+          const candidate = result.candidates?.[0];
+          if (candidate && candidate.content?.parts?.[0]?.text) {
+            return candidate.content.parts[0].text;
+          } else {
+            throw new Error("Struktur respon API tidak valid.");
+          }
+        } catch (error) {
+          if (attempt === maxRetries - 1) throw error;
+          await new Promise(res => setTimeout(res, delay));
+          delay *= 2;
+        }
+      }
+    }
+
+    async function generateAIExecutiveReport() {
+      if (!detainees) detainees = [];
+      if (document.getElementById('aiModalTitle')) document.getElementById('aiModalTitle').innerText = 'Analisis AI Ringkasan Eksekutif Pimpinan';
+      if (document.getElementById('aiLoading')) document.getElementById('aiLoading').classList.remove('hidden');
+      if (document.getElementById('aiResultContent')) document.getElementById('aiResultContent').classList.add('hidden');
+      const modal = document.getElementById('aiModal');
+      if (modal) modal.classList.remove('hidden');
+
+      const systemPrompt = "Anda adalah Analis Senior Keimigrasian di Rumah Detensi Imigrasi Pusat Tanjung Pinang (Rudenim). Berikan analisis eksekutif yang formal, presisi, profesional, dan tajam dalam Bahasa Indonesia untuk Kepala Rudenim berdasarkan data deteni terkini. Format laporan dengan ringkasan statistik, identifikasi hambatan utama pendeportasian, serta rekomendasi strategis percepatan.";
+      
+      const userQuery = `Berikut adalah data deteni WNA yang saat ini terdaftar di SIMPATI Rudenim Pusat Tanjung Pinang:\n\n` + 
+        JSON.stringify(detainees.map(d => ({
+          nama: d.nama,
+          kewarganegaraan: d.negara,
+          paspor: d.paspor,
+          instansiPengirim: d.instansi,
+          pasal: d.pasal,
+          tanggalMasuk: d.tglMasuk,
+          lamaDidetensi: calculateDetentionDuration(d.tglMasuk),
+          statusDeportasi: d.status,
+          jumlahAsistensi: d.asistensi ? d.asistensi.length : 0,
+          catatanAsistensiTerakhir: d.asistensi && d.asistensi.length > 0 ? d.asistensi[d.asistensi.length - 1] : null
+        })), null, 2);
+
+      try {
+        const reportText = await callGeminiApi(userQuery, systemPrompt);
+        if (document.getElementById('aiTextContainer')) document.getElementById('aiTextContainer').innerText = reportText;
+      } catch (err) {
+        console.error("Gagal memanggil Gemini API:", err);
+        const total = detainees.length;
+        const proses = detainees.filter(d => d.status.includes('Proses') || d.status.includes('Pendataan')).length;
+        const siap = detainees.filter(d => d.status === 'Siap Deportasi').length;
+        const selesai = detainees.filter(d => d.status === 'Selesai Pendeportasian').length;
+
+        if (document.getElementById('aiTextContainer')) {
+          document.getElementById('aiTextContainer').innerText = `
+**LAPORAN EKSEKUTIF ANALISIS PEMANTAUAN DEPORTASI (SIMPATI)**
+*Rudenim Pusat Tanjung Pinang - Tanggal: ${new Date().toLocaleDateString('id-ID')}*
+
+**1. RINGKASAN REKAPITULASI STATISTIK**
+• Total Deteni Terdaftar: ${total} Orang
+• Dalam Proses Verifikasi/Dokumen Perjalanan: ${proses} Orang
+• Status Siap Deportasi (Tiket Ready): ${siap} Orang
+• Deportasi Selesai dilaksanakan: ${selesai} Orang
+
+**2. ANALISIS TINGKAT HAMBATAN & RESIKO**
+• Hambatan Utama: Sebagian besar deteni dalam proses dokumen perjalanan menunggu penerbitan Surat Perjalanan Laksana Paspor (SPLP) atau Pas Jalan dari perwakilan diplomatik negara asal.
+• Perhatian Khusus: Deteni overstay dengan durasi pendetensian > 60 hari memerlukan tindak lanjut diplomasi intensif atau percepatan koordinasi dengan penjamin/keluarga.
+
+**3. REKOMENDASI STRATEGIS UNTUK PIMPINAN**
+1. Lakukan percepatan berkirim surat koordinasi resmi dan penegasan status kewarganegaraan ke Kedubes terkait.
+2. Prioritaskan pemulangan untuk ${siap} deteni berstatus "Siap Deportasi" dengan pengawalan sesuai SOP Rudenim Pusat Tanjung Pinang.
+3. Intensifkan komunikasi dengan Kanim Pengirim terkait ketersediaan anggaran pemulangan atau fasilitasi tiket mandiri oleh pihak keluarga/sponsor.
+          `.trim();
+        }
+      } finally {
+        if (document.getElementById('aiLoading')) document.getElementById('aiLoading').classList.add('hidden');
+        if (document.getElementById('aiResultContent')) document.getElementById('aiResultContent').classList.remove('hidden');
+      }
+    }
+
+    async function generateAIDraftLetter() {
+      if (!currentDetailId || !detainees) return;
+      const d = detainees.find(item => item.id === currentDetailId);
+      if (!d) return;
+
+      if (document.getElementById('aiModalTitle')) document.getElementById('aiModalTitle').innerText = `Draf Surat AI Koordinasi - ${d.nama}`;
+      if (document.getElementById('aiLoading')) document.getElementById('aiLoading').classList.remove('hidden');
+      if (document.getElementById('aiResultContent')) document.getElementById('aiResultContent').classList.add('hidden');
+      const modal = document.getElementById('aiModal');
+      if (modal) modal.classList.remove('hidden');
+
+      const systemPrompt = "Anda adalah Legal & Administrative Officer di Rumah Detensi Imigrasi Pusat Tanjung Pinang. Tugas Anda adalah menyusun draf surat dinas resmi keimigrasian/diplomatik dalam Bahasa Indonesia yang sangat formal, santun, dan sesuai standar korespondensi Kemenkumham / Ditjen Imigrasi.";
+      
+      const userQuery = `Buatkan draf surat permohonan penerbitan Surat Perjalanan Laksana Paspor (SPLP) / Dokumen Perjalanan / Verifikasi Kewarganegaraan yang ditujukan kepada Bagian Konsuler Kedutaan Besar / Konsulat Jenderal Negara ${d.negara} di Indonesia.
+      
+Detail Data Deteni:
+- Nomor Register: ${d.id}
+- Nama Lengkap: ${d.nama}
+- Kewarganegaraan: ${d.negara}
+- Nomor Paspor/Dokumen: ${d.paspor}
+- Instansi Pengirim: ${d.instansi}
+- Pasal Pelanggaran: ${d.pasal}
+- Tanggal Masuk Rudenim: ${formatDate(d.tglMasuk)} (Lama didetensi: ${calculateDetentionDuration(d.tglMasuk)})
+- Status Saat Ini: ${d.status}
+- Histori Catatan Asistensi Terakhir: ${JSON.stringify(d.asistensi || [])}`;
+
+      try {
+        const draftText = await callGeminiApi(userQuery, systemPrompt);
+        if (document.getElementById('aiTextContainer')) document.getElementById('aiTextContainer').innerText = draftText;
+      } catch (err) {
+        console.error("Gagal memanggil Gemini API:", err);
+        const lastAst = d.asistensi && d.asistensi.length > 0 ? d.asistensi[d.asistensi.length - 1] : null;
+        const astInfo = lastAst ? `Catatan Asistensi Terakhir (${formatDate(lastAst.tanggal)}): ${lastAst.hasil}` : 'Belum dilakukan asistensi formal.';
+
+        if (document.getElementById('aiTextContainer')) {
+          document.getElementById('aiTextContainer').innerText = `
+**PERMOHONAN PENERBITAN DOKUMEN PERJALANAN / PAS JALAN**
+
+Nomor       : W.8.IMI.RUDENIM.${d.id}
+Sifat       : Segera
+Hal         : Permohonan Asistensi Verifikasi & Penerbitan Dokumen Perjalanan a.n. ${d.nama}
+
+Kepada Yth.
+Kepala Bagian Konsuler / Kedutaan Besar / Konsulat
+Negara ${d.negara}
+di Tempat
+
+Dengan hormat,
+
+Sehubungan dengan penanganan Warga Negara Asing (WNA) yang saat ini didetensi di Rumah Detensi Imigrasi Pusat Tanjung Pinang:
+
+1. Identitas Deteni:
+   • Nama Lengkap       : ${d.nama}
+   • Kewarganegaraan    : ${d.negara}
+   • No. Paspor / Dok   : ${d.paspor}
+   • Instansi Pengirim  : ${d.instansi}
+   • Pelanggaran        : ${d.pasal}
+   • Tanggal Masuk      : ${formatDate(d.tglMasuk)}
+
+2. Perkembangan Penanganan (SIMPATI):
+   ${astInfo}
+
+Berkenaan dengan hal tersebut di atas, kami memohon bantuan Bapak/Ibu untuk berkenan menerbitkan dokumen perjalanan (SPLP/Travel Document) guna kelancaran proses pemulangan/pendeportasian deteni yang bersangkutan ke negara asal.
+
+Atas perhatian dan kerja sama yang baik, kami ucapkan terima kasih.
+
+Kepala Rumah Detensi Imigrasi Pusat Tanjung Pinang
+          `.trim();
+        }
+      } finally {
+        if (document.getElementById('aiLoading')) document.getElementById('aiLoading').classList.add('hidden');
+        if (document.getElementById('aiResultContent')) document.getElementById('aiResultContent').classList.remove('hidden');
+      }
+    }
+
+    async function generateAICaseAdvice() {
+      if (!currentDetailId || !detainees) return;
+      const d = detainees.find(item => item.id === currentDetailId);
+      if (!d) return;
+
+      if (document.getElementById('aiModalTitle')) document.getElementById('aiModalTitle').innerText = `Saran Strategis AI Percepatan - ${d.nama}`;
+      if (document.getElementById('aiLoading')) document.getElementById('aiLoading').classList.remove('hidden');
+      if (document.getElementById('aiResultContent')) document.getElementById('aiResultContent').classList.add('hidden');
+      const modal = document.getElementById('aiModal');
+      if (modal) modal.classList.remove('hidden');
+
+      const systemPrompt = "Anda adalah Spesialis Penindakan dan Deportasi Imigrasi. Berikan analisis teknis dan saran konkret langkah demi langkah untuk mempercepat deportasi deteni spesifik ini berdasarkan regulasi Keimigrasian Indonesia (UU No. 6 Tahun 2011) serta taktik komunikasi diplomatik/pemeriksaan regstatus.";
+
+      const userQuery = `Berikan rekomendasi teknis penanganan dan langkah tindak lanjut tercepat untuk deteni berikut:
+Nama: ${d.nama}
+Kewarganegaraan: ${d.negara}
+No Paspor/SPLP: ${d.paspor}
+Instansi Pengirim: ${d.instansi}
+Pelanggaran: ${d.pasal}
+Lama Didetensi: ${calculateDetentionDuration(d.tglMasuk)}
+Status Deportasi: ${d.status}
+Riwayat Asistensi: ${JSON.stringify(d.asistensi || [])}`;
+
+      try {
+        const adviceText = await callGeminiApi(userQuery, systemPrompt);
+        if (document.getElementById('aiTextContainer')) document.getElementById('aiTextContainer').innerText = adviceText;
+      } catch (err) {
+        console.error("Gagal memanggil Gemini API:", err);
+        if (document.getElementById('aiTextContainer')) document.getElementById('aiTextContainer').innerText = "Gagal terhubung ke layanan AI Gemini. Pastikan koneksi internet terhubung.";
+      } finally {
+        if (document.getElementById('aiLoading')) document.getElementById('aiLoading').classList.add('hidden');
+        if (document.getElementById('aiResultContent')) document.getElementById('aiResultContent').classList.remove('hidden');
+      }
+    }
+
+    function copyAiOutput() {
+      const text = document.getElementById('aiTextContainer')?.innerText;
+      if (!text) return;
+      
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        showToast('Teks berhasil disalin ke clipboard.');
+      } catch (err) {
+        showToast('Gagal menyalin teks.');
+      }
+      document.body.removeChild(textarea);
+    }
+
+    function exportToCSV() {
+      if (!detainees) return;
+      let csv = 'ID,Nama Deteni,Kewarganegaraan,No Paspor,Instansi Pengirim,Pasal Dilanggar,Tanggal Masuk,Status Pendeportasian,Jumlah Asistensi\n';
+      
+      detainees.forEach(d => {
+        const countAsistensi = d.asistensi ? d.asistensi.length : 0;
+        csv += `"${d.id}","${d.nama}","${d.negara}","${d.paspor}","${d.instansi}","${d.pasal}","${d.tglMasuk}","${d.status}","${countAsistensi}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `SIMPATI_Report_Deteni_Rudenim_TPI_${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast('Laporan CSV berhasil diunduh.');
+    }
+
+    function showToast(message) {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+      const toast = document.createElement('div');
+      toast.className = 'bg-slate-900/90 text-white text-xs px-4 py-2.5 rounded-xl shadow-xl border border-slate-700 flex items-center gap-2 transform transition-all duration-300 pointer-events-auto';
+      toast.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i> <span>${message}</span>`;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
