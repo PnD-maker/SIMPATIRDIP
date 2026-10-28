@@ -655,7 +655,7 @@
   <!-- FIREBASE CLOUD STORAGE SCRIPT MODULE -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     // Application Config & Variables
@@ -673,28 +673,43 @@
     };
 
     let app, auth, db;
-    let isCloudActive = false;
 
     // Initialize Firebase Cloud Service
-    try {
-      app = initializeApp(firebaseConfig);
-      auth = getAuth(app);
-      db = getFirestore(app);
+    async function initFirebase() {
+      try {
+        app = initializeApp(firebaseConfig);
+        db = getFirestore(app);
+        
+        // Attempt optional authentication with fallback
+        try {
+          auth = getAuth(app);
+          if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+            await signInWithCustomToken(auth, __initial_auth_token);
+          } else {
+            await signInAnonymously(auth);
+          }
+        } catch (authError) {
+          console.warn("Firebase Auth bypassed or Anonymous Auth disabled in console:", authError);
+        }
 
-      // Authenticate
-      if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-        await signInWithCustomToken(auth, __initial_auth_token);
-      } else {
-        await signInAnonymously(auth);
+        // Proceed to set up Firestore realtime synchronization
+        setupRealtimeListener();
+
+      } catch (e) {
+        console.error("Firebase Init Error:", e);
+        updateCloudStatusBadge(false, "Offline / Init Error");
       }
+    }
+
+    function setupRealtimeListener() {
+      if (!db) return;
 
       // Strict Firestore Collection Path for Shared Public Data
       const publicCollectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'detainees');
 
       // Realtime Cloud Listener
       onSnapshot(publicCollectionRef, (snapshot) => {
-        isCloudActive = true;
-        updateCloudStatusBadge(true);
+        updateCloudStatusBadge(true, "Cloud Connected (simpati-pnd)");
 
         const cloudItems = [];
         snapshot.forEach((docSnap) => {
@@ -702,64 +717,68 @@
         });
 
         if (cloudItems.length > 0) {
+          // Update data lokal dari cloud
           window.detainees = cloudItems;
-          window.saveToLocalStorage(false); // Update local cache without triggering recursion
+          window.saveToLocalStorage(false);
           window.populateDropdownFilters();
           window.renderDashboard();
           if (window.currentDetailId) {
             window.openDetailModal(window.currentDetailId);
           }
         } else if (window.detainees && window.detainees.length > 0) {
-          // Push initial data to cloud if collection is fresh
+          // Pindahkan data awal ke cloud jika cloud masih kosong
           window.detainees.forEach(d => window.syncSingleDetaineeToCloud(d));
         }
       }, (error) => {
-        console.warn("Firestore snapshot falling back to local mode:", error);
-        isCloudActive = false;
-        updateCloudStatusBadge(false);
+        console.error("Firestore snapshot error:", error);
+        updateCloudStatusBadge(false, "Firestore Rule / Permission Blocked");
       });
-
-    } catch (e) {
-      console.warn("Cloud Firestore initialization fallback to LocalStorage mode:", e);
-      isCloudActive = false;
-      updateCloudStatusBadge(false);
     }
 
-    // Helper to sync single detainee item to cloud
+    // Synchronize single detainee item to cloud
     window.syncSingleDetaineeToCloud = async function(detaineeObj) {
-      if (!db || !auth.currentUser) return;
+      if (!db) {
+        console.warn("Firestore belum siap.");
+        return;
+      }
       try {
         const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'detainees', detaineeObj.id);
         await setDoc(docRef, detaineeObj, { merge: true });
+        console.log("Cloud sync sukses untuk ID:", detaineeObj.id);
       } catch (err) {
-        console.error("Cloud sync error for ID:", detaineeObj.id, err);
+        console.error("Cloud sync error:", err);
+        showToast("Gagal menyimpan ke Cloud Firebase. Periksa aturan Firestore Rules.");
       }
     };
 
-    // Helper to delete detainee item from cloud
+    // Delete detainee item from cloud
     window.deleteDetaineeFromCloud = async function(detaineeId) {
-      if (!db || !auth.currentUser) return;
+      if (!db) return;
       try {
         const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'detainees', detaineeId);
         await deleteDoc(docRef);
+        console.log("Cloud delete sukses untuk ID:", detaineeId);
       } catch (err) {
-        console.error("Cloud delete error for ID:", detaineeId, err);
+        console.error("Cloud delete error:", err);
       }
     };
 
-    function updateCloudStatusBadge(online) {
+    function updateCloudStatusBadge(online, message) {
       const badge = document.getElementById('cloudStatusBadge');
       const text = document.getElementById('cloudStatusText');
       if (!badge || !text) return;
 
       if (online) {
         badge.className = 'inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
-        text.innerText = 'Cloud Realtime Synced (simpati-pnd)';
+        text.innerText = message || 'Cloud Realtime Synced';
       } else {
         badge.className = 'inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/40';
-        text.innerText = 'Local Offline Mode';
+        text.innerText = message || 'Local Offline Mode';
       }
     }
+
+    // Jalankan inisialisasi Firebase
+    initFirebase();
   </script>
 
   <!-- JAVASCRIPT LOGIC -->
