@@ -109,9 +109,16 @@
             </svg>
           </div>
           <div>
-            <h1 class="text-xl sm:text-2xl font-black tracking-wider uppercase text-white flex items-center gap-2">
-              SIMPATI
-            </h1>
+            <div class="flex items-center gap-2">
+              <h1 class="text-xl sm:text-2xl font-black tracking-wider uppercase text-white">
+                SIMPATI
+              </h1>
+              <!-- Cloud Status Indicator -->
+              <span id="cloudStatusBadge" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                <i class="fa-solid fa-cloud text-[9px] animate-pulse"></i>
+                <span id="cloudStatusText">Cloud Connected</span>
+              </span>
+            </div>
             <p class="text-xs text-slate-300 font-medium">Sistem Informasi Monitoring Asistensi Pemulangan dan Deportasi</p>
             <p class="text-[10px] text-immi-gold font-semibold tracking-wide uppercase">Rudenim Pusat Tanjung Pinang</p>
           </div>
@@ -297,8 +304,8 @@
     <div class="max-w-7xl mx-auto px-4 text-center flex flex-col sm:flex-row justify-between items-center gap-2">
       <p>&copy; 2026 SIMPATI - Rumah Detensi Imigrasi Pusat Tanjung Pinang</p>
       <p class="flex items-center gap-2">
-        <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
-        Sistem Informasi Monitoring Asistensi Pemulangan dan Deportasi
+        <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+        Cloud Storage Real-time Synchronized
       </p>
     </div>
   </footer>
@@ -628,7 +635,7 @@
       </div>
       <div>
         <h3 class="text-lg font-bold text-slate-900">Konfirmasi Hapus Data</h3>
-        <p class="text-xs text-slate-500 mt-1">Apakah Anda yakin ingin menghapus data deteni berikut dari SIMPATI?</p>
+        <p class="text-xs text-slate-500 mt-1">Apakah Anda yakin ingin menghapus data deteni berikut dari SIMPATI Cloud?</p>
         <p id="deleteDetaineeName" class="text-sm font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-lg p-2 mt-2 break-all">-</p>
       </div>
       <div class="flex justify-center gap-3 pt-2">
@@ -645,17 +652,124 @@
   <!-- TOAST NOTIFICATION CONTAINER -->
   <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
+  <!-- FIREBASE CLOUD STORAGE SCRIPT MODULE -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // Application Config & Variables
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'simpati-pnd';
+    
+    // Konfigurasi Firebase Anda (simpati-pnd)
+    const firebaseConfig = {
+      apiKey: "AIzaSyBv8ctJdUwRfwXl0DBhHovYKdmOJAwZc74",
+      authDomain: "simpati-pnd.firebaseapp.com",
+      databaseURL: "https://simpati-pnd-default-rtdb.firebaseio.com",
+      projectId: "simpati-pnd",
+      storageBucket: "simpati-pnd.firebasestorage.app",
+      messagingSenderId: "390467372221",
+      appId: "1:390467372221:web:58a4cd5948449773f6e3d4"
+    };
+
+    let app, auth, db;
+    let isCloudActive = false;
+
+    // Initialize Firebase Cloud Service
+    try {
+      app = initializeApp(firebaseConfig);
+      auth = getAuth(app);
+      db = getFirestore(app);
+
+      // Authenticate
+      if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+        await signInWithCustomToken(auth, __initial_auth_token);
+      } else {
+        await signInAnonymously(auth);
+      }
+
+      // Strict Firestore Collection Path for Shared Public Data
+      const publicCollectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'detainees');
+
+      // Realtime Cloud Listener
+      onSnapshot(publicCollectionRef, (snapshot) => {
+        isCloudActive = true;
+        updateCloudStatusBadge(true);
+
+        const cloudItems = [];
+        snapshot.forEach((docSnap) => {
+          cloudItems.push(docSnap.data());
+        });
+
+        if (cloudItems.length > 0) {
+          window.detainees = cloudItems;
+          window.saveToLocalStorage(false); // Update local cache without triggering recursion
+          window.populateDropdownFilters();
+          window.renderDashboard();
+          if (window.currentDetailId) {
+            window.openDetailModal(window.currentDetailId);
+          }
+        } else if (window.detainees && window.detainees.length > 0) {
+          // Push initial data to cloud if collection is fresh
+          window.detainees.forEach(d => window.syncSingleDetaineeToCloud(d));
+        }
+      }, (error) => {
+        console.warn("Firestore snapshot falling back to local mode:", error);
+        isCloudActive = false;
+        updateCloudStatusBadge(false);
+      });
+
+    } catch (e) {
+      console.warn("Cloud Firestore initialization fallback to LocalStorage mode:", e);
+      isCloudActive = false;
+      updateCloudStatusBadge(false);
+    }
+
+    // Helper to sync single detainee item to cloud
+    window.syncSingleDetaineeToCloud = async function(detaineeObj) {
+      if (!db || !auth.currentUser) return;
+      try {
+        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'detainees', detaineeObj.id);
+        await setDoc(docRef, detaineeObj, { merge: true });
+      } catch (err) {
+        console.error("Cloud sync error for ID:", detaineeObj.id, err);
+      }
+    };
+
+    // Helper to delete detainee item from cloud
+    window.deleteDetaineeFromCloud = async function(detaineeId) {
+      if (!db || !auth.currentUser) return;
+      try {
+        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'detainees', detaineeId);
+        await deleteDoc(docRef);
+      } catch (err) {
+        console.error("Cloud delete error for ID:", detaineeId, err);
+      }
+    };
+
+    function updateCloudStatusBadge(online) {
+      const badge = document.getElementById('cloudStatusBadge');
+      const text = document.getElementById('cloudStatusText');
+      if (!badge || !text) return;
+
+      if (online) {
+        badge.className = 'inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
+        text.innerText = 'Cloud Realtime Synced (simpati-pnd)';
+      } else {
+        badge.className = 'inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/40';
+        text.innerText = 'Local Offline Mode';
+      }
+    }
+  </script>
+
   <!-- JAVASCRIPT LOGIC -->
   <script>
     const STORAGE_KEY = 'SIMPATI_DETAINEES_DATA_V1';
 
-    function saveToLocalStorage() {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(detainees));
-      } catch (e) {
-        console.error('Failed to save to local storage:', e);
-      }
-    }
+    // Global Variables
+    var detainees = [];
+    var currentDetailId = null;
+    var detaineeIdToDelete = null;
 
     const INITIAL_SAMPLE_DATA = [
       {
@@ -707,7 +821,7 @@
             ke: 2,
             tanggal: '2026-01-25',
             petugas: 'Dedi Kurniawan',
-            hasil: 'Tiket penerbangan penerbangan Jakarta - Beijing telah terbit tanggal 20 Februari 2026.',
+            hasil: 'Tiket penerbangan Jakarta - Beijing telah terbit tanggal 20 Februari 2026.',
             tindakLanjut: 'Persiapan pengawalan menuju Bandara Soekarno-Hatta.'
           }
         ]
@@ -734,9 +848,13 @@
       }
     ];
 
-    var detainees = [];
-    var currentDetailId = null;
-    var detaineeIdToDelete = null;
+    function saveToLocalStorage(syncToCloud = true) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(detainees));
+      } catch (e) {
+        console.error('Failed to save to local storage:', e);
+      }
+    }
 
     function deleteDetainee(id) {
       if (!detainees || detainees.length === 0) return;
@@ -760,6 +878,12 @@
       detainees = detainees.filter(item => item.id !== id);
 
       saveToLocalStorage();
+      
+      // Delete from cloud if module function exists
+      if (typeof window.deleteDetaineeFromCloud === 'function') {
+        window.deleteDetaineeFromCloud(id);
+      }
+
       populateDropdownFilters();
       renderDashboard();
 
@@ -1122,13 +1246,17 @@
       if (idx !== -1) {
         detainees[idx].status = newStatus;
         saveToLocalStorage();
+
+        if (typeof window.syncSingleDetaineeToCloud === 'function') {
+          window.syncSingleDetaineeToCloud(detainees[idx]);
+        }
+
         renderDashboard();
         openDetailModal(currentDetailId);
         showToast(`Status berhasil diperbarui menjadi '${newStatus}'.`);
       }
     }
 
-    // SAFELY OPEN ADD MODAL
     function openAddModal() {
       const editIdElem = document.getElementById('editId');
       if (editIdElem) editIdElem.value = '';
@@ -1149,7 +1277,6 @@
       if (modal) modal.classList.remove('hidden');
     }
 
-    // SAFELY OPEN EDIT MODAL
     function openEditModal(id) {
       const d = detainees.find(item => item.id === id);
       if (!d) return;
@@ -1222,24 +1349,33 @@
         foto: document.getElementById('formFotoBase64')?.value || ''
       };
 
+      let targetItem = null;
+
       if (editId) {
         const index = detainees.findIndex(d => d.id === editId);
         if (index !== -1) {
           detainees[index] = { ...detainees[index], ...formData };
+          targetItem = detainees[index];
           showToast(`Data deteni ${formData.nama} berhasil diperbarui.`);
         }
       } else {
         const year = new Date(formData.tglMasuk).getFullYear() || new Date().getFullYear();
         const newId = `DET-${year}-${String(detainees.length + 1).padStart(3, '0')}`;
-        detainees.unshift({
+        targetItem = {
           id: newId,
           ...formData,
           asistensi: []
-        });
-        showToast(`Deteni baru ${formData.nama} berhasil ditambahkan ke SIMPATI.`);
+        };
+        detainees.unshift(targetItem);
+        showToast(`Deteni baru ${formData.nama} berhasil ditambahkan.`);
       }
 
       saveToLocalStorage();
+
+      if (targetItem && typeof window.syncSingleDetaineeToCloud === 'function') {
+        window.syncSingleDetaineeToCloud(targetItem);
+      }
+
       populateDropdownFilters();
       renderDashboard();
       closeModal('detaineeModal');
@@ -1317,6 +1453,11 @@
       detainees[dIndex].asistensi.sort((a, b) => a.ke - b.ke);
 
       saveToLocalStorage();
+
+      if (typeof window.syncSingleDetaineeToCloud === 'function') {
+        window.syncSingleDetaineeToCloud(detainees[dIndex]);
+      }
+
       renderDashboard();
       openDetailModal(detId);
       closeModal('addAssistanceModal');
@@ -1330,6 +1471,11 @@
       if (confirm('Apakah Anda yakin ingin menghapus catatan asistensi ini?')) {
         detainees[dIndex].asistensi.splice(index, 1);
         saveToLocalStorage();
+
+        if (typeof window.syncSingleDetaineeToCloud === 'function') {
+          window.syncSingleDetaineeToCloud(detainees[dIndex]);
+        }
+
         renderDashboard();
         openDetailModal(currentDetailId);
         showToast('Catatan asistensi berhasil dihapus.');
