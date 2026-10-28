@@ -894,11 +894,13 @@
       const d = detainees.find(item => item.id === id);
       const detaineeName = d ? d.nama : id;
 
+      // 1. Hapus dari memori lokal
       detainees = detainees.filter(item => item.id !== id);
 
-      saveToLocalStorage();
+      // 2. Simpan perubahan ke LocalStorage tanpa memicu re-sync data lama
+      saveToLocalStorage(false);
       
-      // Delete from cloud if module function exists
+      // 3. Hapus data secara permanen dari Cloud Firestore Firebase
       if (typeof window.deleteDetaineeFromCloud === 'function') {
         window.deleteDetaineeFromCloud(id);
       }
@@ -913,7 +915,7 @@
       closeModal('deleteConfirmModal');
       detaineeIdToDelete = null;
 
-      showToast(`Data deteni ${detaineeName} berhasil dihapus.`);
+      showToast(`Data deteni ${detaineeName} berhasil dihapus permanen dari Cloud.`);
     }
 
     function formatDate(dateStr) {
