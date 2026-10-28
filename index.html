@@ -256,7 +256,7 @@
       <div class="px-6 py-4 border-b border-slate-100 flex flex-col sm:flex-row justify-between sm:items-center gap-2">
         <h2 class="text-base font-bold text-immi-navy flex items-center gap-2">
           <i class="fa-solid fa-list-check text-immi-blue"></i>
-          Daftar Monitoring Deteni WNA (SIMPATI)
+          Daftar Monitoring Deteni
         </h2>
         <span id="dataCountText" class="text-xs font-semibold px-2.5 py-1 bg-slate-100 text-slate-600 rounded-full border border-slate-200">
           Menampilkan 0 data
@@ -673,6 +673,7 @@
     };
 
     let app, auth, db;
+    let isInitialLoadDone = false;
 
     // Initialize Firebase Cloud Service
     async function initFirebase() {
@@ -716,19 +717,31 @@
           cloudItems.push(docSnap.data());
         });
 
-        if (cloudItems.length > 0) {
-          // Update data lokal dari cloud
-          window.detainees = cloudItems;
-          window.saveToLocalStorage(false);
-          window.populateDropdownFilters();
-          window.renderDashboard();
-          if (window.currentDetailId) {
+        // Selalu update data lokal dari cloud, termasuk ketika database cloud kosong (0 item)
+        window.detainees = cloudItems;
+        window.saveToLocalStorage(false);
+        window.populateDropdownFilters();
+        window.renderDashboard();
+
+        if (window.currentDetailId) {
+          const detailExists = window.detainees.some(d => d.id === window.currentDetailId);
+          if (detailExists) {
             window.openDetailModal(window.currentDetailId);
+          } else {
+            window.closeModal('detailModal');
+            window.currentDetailId = null;
           }
-        } else if (window.detainees && window.detainees.length > 0) {
-          // Pindahkan data awal ke cloud jika cloud masih kosong
-          window.detainees.forEach(d => window.syncSingleDetaineeToCloud(d));
         }
+
+        // Hanya upload sample data awal secara otomatis jika cloud benar-benar belum pernah di-set
+        if (!isInitialLoadDone && snapshot.metadata.fromCache === false && snapshot.empty && localStorage.getItem('SIMPATI_INITIALIZED') !== 'true') {
+          localStorage.setItem('SIMPATI_INITIALIZED', 'true');
+          if (window.detainees && window.detainees.length > 0) {
+            window.detainees.forEach(d => window.syncSingleDetaineeToCloud(d));
+          }
+        }
+        isInitialLoadDone = true;
+
       }, (error) => {
         console.error("Firestore snapshot error:", error);
         updateCloudStatusBadge(false, "Firestore Rule / Permission Blocked");
